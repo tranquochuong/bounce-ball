@@ -1,0 +1,136 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bounce ball</title>
+</head>
+<body>
+    <canvas id="myCanvas" width="500px" height="400" style="border:2px solid lightblue"  ></canvas>
+</body>
+<script>
+    var canvas = document.getElementById("myCanvas");
+    var ctx = canvas.getContext("2d");
+
+    document.addEventListener('keyup',function(event){
+        if(event.keyCode==37){
+            Rectangle.isMovingleft = false;
+        } else if(event.keyCode==39){
+            Rectangle.isMovingRight = false;
+        }
+    });
+
+    document.addEventListener('keydown',function(event){
+        if(event.keyCode==37){
+            Rectangle.isMovingleft = true;
+        } else if(event.keyCode==39){
+            Rectangle.isMovingRight = true;
+        }
+    });
+
+
+    var Rectangle ={
+        width: 100,  
+        height: 15,
+        x: 0,
+        y: canvas.height- 10,    
+        speed : 15,
+        isMovingleft : false,
+        isMovingRight : false,
+    }
+
+    var ballRadius = 10;
+    var x = canvas.width/2;
+    var y = canvas.height-30;
+    var dx = 2;
+    var dy = -2;
+
+    var isGamesOver = false;
+    var isGamesWin = false;
+    var UserScore = 0;
+    var MaxScore = 5;
+
+    function drawRectangle(){
+    ctx.fillstyle='black';
+    ctx.fillRect(Rectangle.x, Rectangle.y ,Rectangle.width,Rectangle.height);
+    ctx.fill();
+    ctx.closePath();
+    }
+    function drawBall() {
+    ctx.beginPath();
+    ctx.arc(x, y, ballRadius, 0, Math.PI*2);
+    ctx.fillStyle = "#0095DD";
+    ctx.fill();
+    ctx.closePath();
+}
+function handleBallCollideBonus(){
+    if(x  > canvas.width-ballRadius || x < ballRadius ){
+        dx = -dx;
+    }
+    if( y  < ballRadius){
+        dy = -dy;
+    }    
+}
+function handleRectangleColliDebonus(){
+    if(Rectangle.isMovingleft){
+        Rectangle.x -= Rectangle.speed;
+    } else if(Rectangle.isMovingRight){
+        Rectangle.x += Rectangle.speed;
+    }
+
+    if( Rectangle.x < 0){
+       Rectangle.x = 0; 
+    } 
+    else if(Rectangle.x > canvas.width - Rectangle.width){
+        Rectangle.x = canvas.width - Rectangle.width;
+    } 
+ 
+}
+function updateBallPosition(){
+    x += dx;
+    y += dy;
+    if(y > canvas.height - ballRadius){
+        isGamesOver = true;
+       
+    }   
+}
+function handleRectangleColliBall(){
+ if(x + ballRadius >= Rectangle.x && x + ballRadius <= Rectangle.x + Rectangle.width && y + ballRadius>= canvas.height - Rectangle.height){
+    dy = -dy;
+    UserScore += 1;
+    if(UserScore == MaxScore){
+        isGamesWin = true; 
+        isGamesOver = true;
+    }
+ }
+}
+ function handeGamesOver(){
+    if(isGamesWin){
+        alert("You Win!");
+        alert(`UsersSocre : $${UserScore}`);
+        clearInterval(interval);
+    }else{
+        alert("You lose");
+        alert(`UsersSocre : $${UserScore}`);
+        clearInterval(interval);
+    }
+ }
+function draw() {
+    if(!isGamesOver){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawBall();
+    drawRectangle();
+    handleBallCollideBonus();
+    handleRectangleColliDebonus();
+    handleRectangleColliBall();
+    updateBallPosition();
+    }
+   else{
+    handeGamesOver();
+    }
+}
+var interval = setInterval(draw,15);
+    </script>
+</html>
